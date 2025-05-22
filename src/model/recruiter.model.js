@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const Recruiter = new mongoose.model( {
+const Recruiter = new mongoose.Schema( {
     name: {
         type: String,
         required: true,
