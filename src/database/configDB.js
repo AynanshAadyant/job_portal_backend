@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const connectDB = async () => {
     try{
         
-        const connectionInstance = await mongoose.connect( `mongodb+srv://AynanshAadyant:Aynansh123@cluster0.ls7c6.mongodb.net/job_portal`);
+        const connectionInstance = await mongoose.connect( process.env.MONGO_URL);
         console.log(`MongoDB connected ` );
     }
     catch(err) {
