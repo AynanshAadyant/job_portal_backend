@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const secretKey = '123455679faoi10oisodvolski';
-const generateAccessToken = async (data ) => {
+const generateAccessToken = async ( data ) => {
     return jwt.sign( data, secretKey, { expiresIn: '1d' } )
 }
 

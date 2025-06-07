@@ -21,7 +21,6 @@ const Recruiter = new mongoose.Schema( {
         name: {
             type: String, 
             required: true,
-            unique: true
         },
         location: {
             type: String,

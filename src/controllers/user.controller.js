@@ -1,7 +1,7 @@
 import User from "../model/user.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { checkPassword, hashPassword } from "../utils/hashPassword.js";
-import { decodeToken, generateAccessToken } from "../utils/tokens.js";
+import { decodeToken, generateAccessToken, generateRefreshToken } from "../utils/tokens.js";
 
 const createUser = async( req, res ) => {
     const { name, email, password, phone, location, skills, experience } =req.body;
@@ -22,32 +22,32 @@ const createUser = async( req, res ) => {
         })
     }
 
-    const resumeLocal = req?.files?.resume?.[0]?.path;
-    if( !resumeLocal ) {
-        return res.status( 400 ).json( {
-            success : false,
-            status: 400,
-            message: "Resume missing"
-        })
-    } 
+    // const resumeLocal = req?.files?.resume?.[0]?.path;
+    // if( !resumeLocal ) {
+    //     return res.status( 400 ).json( {
+    //         success : false,
+    //         status: 400,
+    //         message: "Resume missing"
+    //     })
+    // } 
 
-    const resume = await uploadOnCloudinary( resumeLocal );
-    if( !resume ) {
-        return res.status( 400 ).json( {
-            success : false, 
-            status : 400,
-            message : "Uploading resume failed" 
-        })
-    }
+    // const resume = await uploadOnCloudinary( resumeLocal );
+    // if( !resume ) {
+    //     return res.status( 400 ).json( {
+    //         success : false, 
+    //         status : 400,
+    //         message : "Uploading resume failed" 
+    //     })
+    // }
 
-    const hash = hashPassword( password );
+    const hash = await hashPassword( password );
     
     const userData = {
         name, 
         email,
         password : hash,
         phone, 
-        resume: resumeLocal.url
+        // resume: resumeLocal.url
     }
 
     const user = await User.create( userData );
@@ -69,9 +69,8 @@ const createUser = async( req, res ) => {
 }
 
 const loginUser = async( req, res ) => {
-    const {email, password} = req.body;
-
-    if( !email || !password ) {
+    const { email, password } = req.body;
+    if( email == "" || password == "" ) {
         return res.status( 400 ).json( {
             success : false,
             status : 400,
@@ -104,18 +103,20 @@ const loginUser = async( req, res ) => {
     };
 
     const accessToken = generateAccessToken( userForToken );
-    const refreshToken = generateRefreshToken( findUser._id );
-
+    const refreshToken = await generateRefreshToken( {
+        _id: findUser._id,
+    } );
     await User.findByIdAndUpdate( findUser._id, { refreshToken: refreshToken} );
 
     const cookieOptions = { 
         httpOnly:true,
-        secure: true
+        secure: false,
+        sameSite: 'lax'
     }
 
     return res.status( 200 )
-    .cookie('USER_ACCESS_TOKEN', accessToken )
-    .cookie('USER_REFRESH_TOKEN', refreshToken )
+    .cookie('USER_ACCESS_TOKEN', accessToken, cookieOptions )
+    .cookie('USER_REFRESH_TOKEN', refreshToken, cookieOptions )
     .json( {
         success: true,
         status: 200,
@@ -125,49 +126,14 @@ const loginUser = async( req, res ) => {
 }
 
 const getUser = async( req, res ) => {
-    const token = req.cookie.USER_ACCESS_TOKEN;
-
-    if( !token ) {
-        return res.status( 401 ).json( {
-            success: false,
-            status: 401,
-            message: "No access token found, please login"
-        });
-    }
-    try {
-        const decodeData = decodeToken( token );
-
-        if( !decodeData ) {
-            return res.status( 401 ).json( {
-                success: false,
-                status:  401,
-                message: "Invalid User access token"
-            })
-        }
-
-        const user = await User.FindById( decodeData._id ).select("-password -refreshToken")
-        if( !user ) {
-            return res.status( 404 ).json( {
-                success: false,
-                status: 404,
-                message: "User not found"
-            })
-        }
-        
-        return res.status( 200 ).json({
-            success : true,
+    return res.status( 200 )
+    .json( 
+        {
             status: 200,
-            body: user,
-            message: "Fetched current user"
-        })
-    }
-    catch( err ) {
-        return res.status( 500 ).json( {
-            success : false,
-            status: 500,
-            message: "Error fetching data"
-        });
-    }
+            body: req.user,
+            success: true
+        }
+    )
 }
 
 const logOutUser = async(req, res) => {

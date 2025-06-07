@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 import Recruiter from "../model/recruiter.model";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const protectRoute = async( req, res, next ) => {
     const token = req.cookies.RECRUITER_ACCESS_TOKEN;

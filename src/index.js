@@ -1,8 +1,10 @@
 import app from './app.js'
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 import connectDB from './database/configDB.js';
 
-dotenv.config();
+dotenv.config(
+   
+);
 
 
 connectDB()

@@ -1,10 +1,11 @@
 import { Router } from "express";
-import upload from "../middleware/multer.middleware.js"
+import { uploadPdf } from "../middleware/multer.middleware.js"
 import { createUser, loginUser, getUser, logOutUser } from "../controllers/user.controller.js";
+import protectUser from "../middleware/protectUser.middleware.js"
 
 const router = Router();
 
-router.route( '/signup' ).post(  upload.fields( [
+router.route( '/signup' ).post(  uploadPdf.fields( [
     {
         name : "resume",
         maxCount: 1
@@ -13,7 +14,7 @@ router.route( '/signup' ).post(  upload.fields( [
 
 router.route( "/login" ).post( loginUser );
 
-router.route( "/current" ).get( getUser );
+router.route( "/current" ).get( protectUser, getUser );
 
 router.route( "/logout" ).post( logOutUser );
 

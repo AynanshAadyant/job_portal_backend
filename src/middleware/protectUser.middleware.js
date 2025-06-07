@@ -1,16 +1,21 @@
 import jwt from "jsonwebtoken";
 import User from "../model/user.model.js"
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const protectRoute = async( req, res, next ) => {
-    const token = req.cookies.USER_ACCESS_TOKEN;
-    if( !token ) {
-        return res.status( 400 ).json( {
-            success: false,
-            status: 400,
-            message: "Error: user access token missing"
-        })
-    }
+    
     try{ 
+        const token = req.cookies.USER_ACCESS_TOKEN;
+        console.log( "USER : ", token );
+        if( !token ) {
+            return res.status( 400 ).json( {
+                success: false,
+                status: 400,
+                message: "Error: user access token missing"
+            })
+    }
         const decodeToken = jwt.verify( token, "123455679faoi10oisodvolski")
         if( !decodeToken ) {
             return res.status( 401 ).json( {
@@ -29,6 +34,7 @@ const protectRoute = async( req, res, next ) => {
         }
         
         req.user = user;
+        console.log( "user", req.user );
         next(); 
     }
     catch( e ) {

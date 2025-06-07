@@ -1,10 +1,10 @@
 import { Router } from "express";
-import upload from "../middleware/multer.middleware.js"
+import {uploadImage} from "../middleware/multer.middleware.js"
 import { createRecruiter, getRecruiter, loginRecruiter, logoutRecruiter } from "../controllers/recruiter.controller.js";
 
 const router = Router();
 
-router.route( '/register' ).post( upload.fields( [
+router.route( '/register' ).post( uploadImage.fields( [
     {
         name : "ProfilePicture",
         maxCount : 1

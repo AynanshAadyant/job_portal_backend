@@ -23,25 +23,25 @@ const createRecruiter = async (req, res) => {
         });
     }
 
-    const profilePicLocal = req?.files?.profilePicture?.[0]?.path;
-    if (!profilePicLocal) {
-        return res.status(400).json({
-            success: false,
-            status: 400,
-            message: "Profile Picture missing from recruiter" 
-        });
-    }
+    // const profilePicLocal = req?.files?.profilePicture?.[0]?.path;
+    // if (!profilePicLocal) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         status: 400,
+    //         message: "Profile Picture missing from recruiter" 
+    //     });
+    // }
 
-    const profilePic = await uploadOnCloudinary(profilePicLocal);
-    if (!profilePic) {
-        return res.status(400).json({
-            success: false,
-            status: 400,
-            message: "Failure to store recruiter profile pic in cloudinary"
-        });
-    }
+    // const profilePic = await uploadOnCloudinary(profilePicLocal);
+    // if (!profilePic) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         status: 400,
+    //         message: "Failure to store recruiter profile pic in cloudinary"
+    //     });
+    // }
 
-    const hash = hashPassword(password);
+    const hash = await hashPassword(password);
 
     const recruiterData = {
         name,
@@ -49,7 +49,7 @@ const createRecruiter = async (req, res) => {
         password: hash, 
         phone,
         company,
-        profilePicture: profilePic.url
+        // profilePicture: profilePic.url
     };
 
     const recruiter = await Recruiter.create(recruiterData);
