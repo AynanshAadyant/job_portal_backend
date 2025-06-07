@@ -87,7 +87,7 @@ const loginUser = async( req, res ) => {
         })
     }
 
-    const pass = checkPassword( password, findUser.password );
+    const pass = await checkPassword( password, findUser.password );
     if( !pass ) {
         return res.status( 200 ).json( {
             success : false,
@@ -102,7 +102,7 @@ const loginUser = async( req, res ) => {
         email: findUser.email,
     };
 
-    const accessToken = generateAccessToken( userForToken );
+    const accessToken = await generateAccessToken( userForToken );
     const refreshToken = await generateRefreshToken( {
         _id: findUser._id,
     } );
